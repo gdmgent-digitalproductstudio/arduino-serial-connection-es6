@@ -7,7 +7,8 @@ Een compacte voorbeeldstack waarin een Arduino, een Express-server en een browse
 ```text
 arduino/hardware-sketch.ino  Arduino-code
 server/app.js                Express-routes en configuratie
-server/serial.js             Echte seriële verbinding en mock
+server/serial.js             Alleen de echte seriële verbinding
+server/mock.js               Simulatie van sensor en led
 server/list-ports.js         Overzicht van seriële apparaten
 client/index.html            Semantische interface met Pico CSS
 client/js/api.js             API-functies met exports

@@ -2,8 +2,7 @@ import { ReadlineParser } from "@serialport/parser-readline";
 import { SerialPort } from "serialport";
 
 let port = null;
-let mockTimer = null;
-let status = {
+const status = {
   connected: false,
   mode: "serial",
   path: null,
@@ -17,21 +16,8 @@ const updateSensor = (value) => {
   status.updatedAt = new Date().toISOString();
 };
 
-const startMock = () => {
-  status = { ...status, connected: true, mode: "mock", path: null };
-
-  const simulateSensor = () => {
-    const wave = Math.sin(Date.now() / 1500);
-    updateSensor(Math.round(512 + wave * 450));
-  };
-
-  simulateSensor();
-  mockTimer = setInterval(simulateSensor, 500);
-  console.log("Mock Arduino gestart: sensor en led zijn beschikbaar.");
-};
-
-const startHardware = ({ path, baudRate }) => {
-  status = { ...status, mode: "serial", path };
+export const startSerial = ({ path, baudRate }) => {
+  status.path = path;
   port = new SerialPort({ path, baudRate });
   const parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
@@ -58,23 +44,9 @@ const startHardware = ({ path, baudRate }) => {
   });
 };
 
-export const startSerial = ({ path, baudRate, mock = false }) => {
-  if (mock) {
-    startMock();
-    return;
-  }
+export const getSerialStatus = () => ({ ...status });
 
-  startHardware({ path, baudRate });
-};
-
-export const getStatus = () => ({ ...status });
-
-export const setLed = (state) => {
-  if (status.mode === "mock") {
-    status.led = state;
-    return;
-  }
-
+export const setSerialLed = (state) => {
   if (!port?.isOpen) throw new Error("Arduino is niet verbonden.");
 
   port.write(state === "on" ? "led_on\n" : "led_off\n");
@@ -82,6 +54,5 @@ export const setLed = (state) => {
 };
 
 export const stopSerial = () => {
-  if (mockTimer) clearInterval(mockTimer);
   if (port?.isOpen) port.close();
 };

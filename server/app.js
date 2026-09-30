@@ -1,7 +1,13 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
-import { getStatus, setLed, startSerial, stopSerial } from "./serial.js";
+import { getMockStatus, setMockLed, startMock, stopMock } from "./mock.js";
+import {
+  getSerialStatus,
+  setSerialLed,
+  startSerial,
+  stopSerial
+} from "./serial.js";
 
 const app = express();
 const httpPort = Number(process.env.PORT ?? 3000);
@@ -12,7 +18,14 @@ const serialPath = process.env.SERIAL_PATH ?? pathArgument ?? "COM3";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const clientDirectory = path.resolve(currentDirectory, "../client");
 
-startSerial({ path: serialPath, baudRate, mock });
+if (mock) {
+  startMock();
+} else {
+  startSerial({ path: serialPath, baudRate });
+}
+
+const getStatus = () => (mock ? getMockStatus() : getSerialStatus());
+const setLed = (state) => (mock ? setMockLed(state) : setSerialLed(state));
 
 app.use(express.json());
 app.use(express.static(clientDirectory));
@@ -53,7 +66,8 @@ const server = app.listen(httpPort, () => {
 });
 
 const shutdown = () => {
-  stopSerial();
+  if (mock) stopMock();
+  else stopSerial();
   server.close(() => process.exit(0));
 };
 
