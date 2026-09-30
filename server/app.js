@@ -1,46 +1,29 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { ReadlineParser } from "@serialport/parser-readline";
 import express from "express";
-import { SerialPort } from "serialport";
+import { getStatus, setLed, startSerial, stopSerial } from "./serial.js";
 
 const app = express();
 const httpPort = Number(process.env.PORT ?? 3000);
 const baudRate = Number(process.env.SERIAL_BAUD_RATE ?? 9600);
-const serialPath = process.env.SERIAL_PATH ?? process.argv[2] ?? "COM3";
+const mock = process.argv.includes("--mock") || process.env.SERIAL_MOCK === "true";
+const pathArgument = process.argv.slice(2).find((argument) => !argument.startsWith("--"));
+const serialPath = process.env.SERIAL_PATH ?? pathArgument ?? "COM3";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const clientDirectory = path.resolve(currentDirectory, "../client");
 
-let latestSensor = null;
-let updatedAt = null;
-
-const arduinoPort = new SerialPort({ path: serialPath, baudRate });
-const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: "\n" }));
-
-parser.on("data", (line) => {
-  const cleanLine = line.trim();
-  if (!cleanLine.startsWith("sensor:")) return;
-
-  const value = Number.parseInt(cleanLine.slice("sensor:".length), 10);
-  if (Number.isFinite(value)) {
-    latestSensor = value;
-    updatedAt = new Date().toISOString();
-  }
-});
-
-arduinoPort.on("open", () => {
-  console.log(`Arduino verbonden via ${serialPath}`);
-});
-
-arduinoPort.on("error", (error) => {
-  console.error(`Seriële fout: ${error.message}`);
-});
+startSerial({ path: serialPath, baudRate, mock });
 
 app.use(express.json());
 app.use(express.static(clientDirectory));
 
+app.get("/api/status", (_request, response) => {
+  response.json(getStatus());
+});
+
 app.get("/api/sensor", (_request, response) => {
-  response.json({ sensor: latestSensor, updatedAt });
+  const { sensor, updatedAt } = getStatus();
+  response.json({ sensor, updatedAt });
 });
 
 app.post("/api/led", (request, response) => {
@@ -53,17 +36,26 @@ app.post("/api/led", (request, response) => {
     });
   }
 
-  if (!arduinoPort.isOpen) {
+  try {
+    setLed(state);
+    return response.json({ status: "ok", led: state });
+  } catch (error) {
     return response.status(503).json({
       status: "error",
-      message: "Arduino is niet verbonden."
+      message: error.message
     });
   }
-
-  arduinoPort.write(state === "on" ? "led_on\n" : "led_off\n");
-  return response.json({ status: "ok", led: state });
 });
 
-app.listen(httpPort, () => {
-  console.log(`Webinterface actief op http://localhost:${httpPort}`);
+const server = app.listen(httpPort, () => {
+  const mode = mock ? "mock" : `seriële poort ${serialPath}`;
+  console.log(`Webinterface actief op http://localhost:${httpPort} (${mode})`);
 });
+
+const shutdown = () => {
+  stopSerial();
+  server.close(() => process.exit(0));
+};
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

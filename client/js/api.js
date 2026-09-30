@@ -9,7 +9,7 @@ const getJson = async (url, options = {}) => {
   return data;
 };
 
-export const getSensor = () => getJson("/api/sensor");
+export const getStatus = () => getJson("/api/status");
 
 export const setLed = (state) =>
   getJson("/api/led", {

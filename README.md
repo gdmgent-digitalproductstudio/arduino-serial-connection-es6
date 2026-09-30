@@ -1,54 +1,71 @@
 # Arduino Serial Connection - ES6
 
-Een compacte voorbeeldstack waarin een Arduino, een Express-server en een browserinterface met elkaar communiceren.
+Een compacte voorbeeldstack waarin een Arduino, een Express-server en een browserinterface met elkaar communiceren. De code gebruikt gewone functies en ES6 imports/exports, zonder classes of ingewikkelde abstracties.
 
 ## Structuur
 
 ```text
 arduino/hardware-sketch.ino  Arduino-code
-server/app.js                Express + SerialPort
-client/index.html            Interface
+server/app.js                Express-routes en configuratie
+server/serial.js             Echte seriële verbinding en mock
+server/list-ports.js         Overzicht van seriële apparaten
+client/index.html            Semantische interface met Pico CSS
 client/js/api.js             API-functies met exports
 client/js/main.js            Interfacegedrag met imports
-client/css/styles.css        Vormgeving
+client/css/styles.css        Kleine 90s-stijllaag
 ```
 
 ## Installeren
 
-Vereisten: Node.js 20 of nieuwer, npm en een aangesloten Arduino.
+Vereisten: Node.js 20 of nieuwer en npm.
 
 ```bash
 npm install
 ```
 
-## Starten
+## Met een Arduino starten
 
 1. Upload `arduino/hardware-sketch.ino` naar de Arduino.
 2. Sluit de Serial Monitor in de Arduino IDE.
-3. Start de server met de seriële poort als argument:
+3. Zoek het pad van de aangesloten Arduino:
+
+```bash
+npm run ports
+```
+
+4. Start de server met dat pad:
 
 ```bash
 npm start -- COM3
 ```
 
-Op macOS of Linux:
+Op macOS of Linux ziet dat er bijvoorbeeld zo uit:
 
 ```bash
-npm start -- /dev/cu.usbserial-110
+npm start -- /dev/cu.usbmodem1101
 ```
 
-4. Open <http://localhost:3000>.
+5. Open <http://localhost:3000>.
 
 Je kunt de poort ook instellen via `SERIAL_PATH` in de omgeving.
 
-## ES6-modules
+## Zonder Arduino testen
 
-- De server gebruikt `import` voor Express, SerialPort en Node-modules.
-- `client/js/api.js` exporteert `getSensor()` en `setLed()`.
-- `client/js/main.js` importeert die functies en koppelt ze aan de interface.
-- `package.json` bevat `"type": "module"`.
+```bash
+npm run mock
+```
+
+De mock simuleert de wisselende waarde van sensor A0 en onthoudt de toestand van de led. Daardoor kun je de volledige interface en API testen zonder hardware.
 
 ## API
 
-- `GET /api/sensor`
-- `POST /api/led` met `{ "state": "on" }` of `{ "state": "off" }`
+- `GET /api/status` geeft verbinding, modus, poort, sensor en led terug.
+- `GET /api/sensor` geeft alleen de sensormeting terug.
+- `POST /api/led` met `{ "state": "on" }` of `{ "state": "off" }` bedient de led.
+
+## ES6-modules
+
+- De serverbestanden gebruiken `import` en `export`.
+- `client/js/api.js` exporteert `getStatus()` en `setLed()`.
+- `client/js/main.js` importeert die functies en koppelt ze aan de interface.
+- `package.json` bevat `"type": "module"`.

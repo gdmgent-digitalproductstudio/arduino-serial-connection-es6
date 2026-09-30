@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch server/app.js",
-    "start": "node server/app.js"
+    "start": "node server/app.js",
+    "ports": "node server/list-ports.js",
+    "mock": "node server/app.js --mock"
   },
   "engines": {
     "node": ">=20"

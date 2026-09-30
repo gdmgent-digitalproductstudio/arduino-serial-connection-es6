@@ -5,34 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Arduino Serial Connection demo">
     <title>Arduino Serial Connection</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="/css/styles.css">
   </head>
   <body>
-    <main class="dashboard">
-      <header class="hero">
-        <p class="eyebrow">Digital Product Studio</p>
+    <main class="container">
+      <header>
+        <small>DPS1 / SERIAL.EXE</small>
         <h1>Arduino Serial Connection</h1>
-        <p>Lees een analoge sensor en stuur de ingebouwde led aan via een Express API.</p>
+        <p>Lees een analoge sensor en bedien de ingebouwde led.</p>
       </header>
 
-      <section class="sensor-card" aria-labelledby="sensor-heading">
-        <p class="label" id="sensor-heading">Analoge sensor A0</p>
-        <p class="sensor-value"><span id="sensor-value">—</span><small>/ 1023</small></p>
-        <meter id="sensor-meter" min="0" max="1023" value="0">0</meter>
-        <p class="timestamp" id="sensor-timestamp">Nog geen meting ontvangen</p>
-      </section>
+      <article aria-labelledby="status-heading">
+        <h2 id="status-heading">Verbinding</h2>
+        <dl>
+          <div><dt>Status</dt><dd id="connection">Controleren…</dd></div>
+          <div><dt>Modus</dt><dd id="mode">—</dd></div>
+          <div><dt>Poort</dt><dd id="port">—</dd></div>
+        </dl>
+      </article>
 
-      <section class="control-card" aria-labelledby="control-heading">
-        <div>
-          <p class="label" id="control-heading">Ingebouwde led</p>
-          <h2>Stuur een commando naar Arduino</h2>
-        </div>
-        <div class="button-group">
+      <article aria-labelledby="sensor-heading">
+        <h2 id="sensor-heading">Sensor A0</h2>
+        <p class="reading"><output id="sensor-value">—</output> / 1023</p>
+        <progress id="sensor-meter" max="1023" value="0">0</progress>
+        <small id="sensor-timestamp">Nog geen meting ontvangen</small>
+      </article>
+
+      <article aria-labelledby="led-heading">
+        <h2 id="led-heading">LED_BUILTIN</h2>
+        <p>Huidige toestand: <strong id="led-state">uit</strong></p>
+        <div role="group">
           <button type="button" data-led-state="on">Led aan</button>
           <button type="button" class="secondary" data-led-state="off">Led uit</button>
         </div>
-        <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
-      </section>
+        <p id="feedback" role="status" aria-live="polite"></p>
+      </article>
+
+      <footer><small>Express + SerialPort + ES6 modules</small></footer>
     </main>
 
     <script type="module" src="/js/main.js"></script>
