@@ -1,27 +1,24 @@
 import { SerialPort } from "serialport";
 
-export class SerialPortList {
-  async run() {
-    const ports = await SerialPort.list();
+async function listPorts() {
+  const ports = await SerialPort.list();
 
-    if (ports.length === 0) {
-      console.log("Geen seriële apparaten gevonden.");
-      return;
-    }
-
-    console.table(
-      ports.map(({ path, manufacturer, serialNumber, vendorId, productId }) => ({
-        path,
-        manufacturer: manufacturer ?? "—",
-        serialNumber: serialNumber ?? "—",
-        vendorId: vendorId ?? "—",
-        productId: productId ?? "—"
-      }))
-    );
-
-    console.log("Start daarna bijvoorbeeld met: npm start -- <pad>");
+  if (ports.length === 0) {
+    console.log("Geen seriële apparaten gevonden.");
+    return;
   }
+
+  console.table(
+    ports.map(({ path, manufacturer, serialNumber, vendorId, productId }) => ({
+      path,
+      manufacturer: manufacturer ?? "—",
+      serialNumber: serialNumber ?? "—",
+      vendorId: vendorId ?? "—",
+      productId: productId ?? "—"
+    }))
+  );
+
+  console.log("Start daarna bijvoorbeeld met: npm start -- <pad>");
 }
 
-const serialPortList = new SerialPortList();
-await serialPortList.run();
+await listPorts();
