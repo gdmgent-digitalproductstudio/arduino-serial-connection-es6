@@ -1,4 +1,5 @@
 :root {
+  /* Pico CSS blijft de basis; deze tokens geven de interface haar retro-uiterlijk. */
   --pico-border-radius: 0;
   --pico-font-family: Arial, Helvetica, sans-serif;
   --pico-primary: #000080;
@@ -7,6 +8,7 @@
 }
 
 body {
+  /* Beperk de inhoud tot een compacte instrumentenweergave. */
   min-height: 100vh;
   background: #c0c0c0;
 }
@@ -17,6 +19,7 @@ main {
 }
 
 header {
+  /* Opgemaakte kop en panelen bootsen klassieke desktopcontrols na. */
   margin-bottom: 1rem;
   border: 2px outset #fff;
   padding: 1rem;

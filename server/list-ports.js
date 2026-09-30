@@ -1,5 +1,6 @@
 import { SerialPort } from "serialport";
 
+// Toon de door het besturingssysteem gevonden poorten om SERIAL_PATH te bepalen.
 async function listPorts() {
   const ports = await SerialPort.list();
 

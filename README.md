@@ -9,7 +9,7 @@ arduino/hardware-sketch.ino  Arduino-code
 server/app.js                Express-routes en configuratie
 server/serial.js             SerialDevice voor de echte Arduino
 server/mock.js               MockDevice voor sensor en led
-server/list-ports.js         SerialPortList voor beschikbare apparaten
+server/list-ports.js         Functie om beschikbare apparaten te tonen
 client/index.html            Semantische interface met Pico CSS
 client/js/api.js             API-functies met exports
 client/js/main.js            Interfacegedrag met imports
@@ -67,7 +67,8 @@ De mock simuleert de wisselende waarde van sensor A0 en onthoudt de toestand van
 ## ES6-modules
 
 - De serverbestanden gebruiken `import` en `export`.
-- `SerialDevice`, `MockDevice` en `SerialPortList` zijn kleine classes met één duidelijke taak.
+- `SerialDevice` en `MockDevice` zijn kleine classes met hetzelfde device-contract.
+- `server/list-ports.js` is een losse functie omdat het poortoverzicht geen eigen state nodig heeft.
 - `app.js` maakt één device aan en gebruikt `start()`, `getStatus()`, `setLed()` en `stop()`.
 - `client/js/api.js` exporteert `getStatus()` en `setLed()`.
 - `client/js/main.js` importeert die functies en koppelt ze aan de interface.

@@ -10,12 +10,14 @@
   </head>
   <body>
     <main class="container">
+      <!-- Kop en drie live panelen worden door main.js bijgewerkt. -->
       <header>
         <small>DPS1 / SERIAL.EXE</small>
         <h1>Arduino Serial Connection</h1>
         <p>Lees een analoge sensor en bedien de ingebouwde led.</p>
       </header>
 
+      <!-- De ids zijn de DOM-koppelingen die client/js/main.js bijwerkt. -->
       <article aria-labelledby="status-heading">
         <h2 id="status-heading">Verbinding</h2>
         <dl>
@@ -42,6 +44,7 @@
         <p id="feedback" role="status" aria-live="polite"></p>
       </article>
 
+      <!-- De module-entrypoint haalt data op en koppelt de LED-knoppen. -->
       <footer><small>Express + SerialPort + ES6 modules</small></footer>
     </main>
 
