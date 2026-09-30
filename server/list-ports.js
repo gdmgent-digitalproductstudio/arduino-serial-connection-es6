@@ -1,5 +1,6 @@
 import { SerialPort } from "serialport";
 
+// Toon de gevonden poorten zodat de juiste waarde voor SERIAL_PATH gekozen kan worden.
 const ports = await SerialPort.list();
 
 if (ports.length === 0) {

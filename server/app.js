@@ -10,6 +10,7 @@ import {
 } from "./serial.js";
 
 const app = express();
+// Runtime-instellingen kunnen per machine worden overschreven via de omgeving of CLI.
 const httpPort = Number(process.env.PORT ?? 3000);
 const baudRate = Number(process.env.SERIAL_BAUD_RATE ?? 9600);
 const mock = process.argv.includes("--mock") || process.env.SERIAL_MOCK === "true";
@@ -18,6 +19,7 @@ const serialPath = process.env.SERIAL_PATH ?? pathArgument ?? "COM3";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const clientDirectory = path.resolve(currentDirectory, "../client");
 
+// Start precies één databron; beide varianten worden achter dezelfde API verborgen.
 if (mock) {
   startMock();
 } else {
@@ -27,9 +29,11 @@ if (mock) {
 const getStatus = () => (mock ? getMockStatus() : getSerialStatus());
 const setLed = (state) => (mock ? setMockLed(state) : setSerialLed(state));
 
+// Verwerk JSON-aanvragen en lever de browserbestanden uit client/.
 app.use(express.json());
 app.use(express.static(clientDirectory));
 
+// De statusroute levert alle gegevens die de interface periodiek toont.
 app.get("/api/status", (_request, response) => {
   response.json(getStatus());
 });
@@ -42,6 +46,7 @@ app.get("/api/sensor", (_request, response) => {
 app.post("/api/led", (request, response) => {
   const { state } = request.body;
 
+  // Valideer invoer voor het device aan te roepen; hardwarefouten worden 503.
   if (state !== "on" && state !== "off") {
     return response.status(400).json({
       status: "error",
@@ -66,6 +71,7 @@ const server = app.listen(httpPort, () => {
 });
 
 const shutdown = () => {
+  // Stop de actieve databron voordat de HTTP-server wordt afgesloten.
   if (mock) stopMock();
   else stopSerial();
   server.close(() => process.exit(0));

@@ -1,5 +1,6 @@
 import { getStatus, setLed } from "./api.js";
 
+// Koppel vaste HTML-elementen aan de gegevens uit de serverstatus.
 const connection = document.querySelector("#connection");
 const mode = document.querySelector("#mode");
 const port = document.querySelector("#port");
@@ -11,6 +12,7 @@ const feedback = document.querySelector("#feedback");
 const ledButtons = document.querySelectorAll("[data-led-state]");
 
 const renderStatus = (status) => {
+  // Houd presentatie en device-logica gescheiden: deze functie werkt alleen de DOM bij.
   connection.textContent = status.connected ? "verbonden" : "niet verbonden";
   mode.textContent = status.mode === "mock" ? "mock" : "Arduino";
   port.textContent = status.path ?? "niet van toepassing";
@@ -26,6 +28,7 @@ const refreshStatus = async () => {
   try {
     renderStatus(await getStatus());
   } catch (error) {
+    // Toon netwerk- en API-fouten in dezelfde live feedback als LED-acties.
     connection.textContent = "server niet bereikbaar";
     feedback.textContent = error.message;
   }
@@ -33,6 +36,7 @@ const refreshStatus = async () => {
 
 ledButtons.forEach((button) => {
   button.addEventListener("click", async () => {
+    // De knopwaarde correspondeert met het state-veld van POST /api/led.
     const state = button.dataset.ledState;
 
     try {
@@ -46,4 +50,5 @@ ledButtons.forEach((button) => {
 });
 
 await refreshStatus();
+// Poll de status zodat verbinding en sensormeting vanzelf actueel blijven.
 setInterval(refreshStatus, 1000);

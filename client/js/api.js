@@ -1,3 +1,4 @@
+// Deel JSON-responses en API-fouten op één plek voor alle browseraanvragen.
 const getJson = async (url, options = {}) => {
   const response = await fetch(url, options);
   const data = await response.json();
@@ -11,6 +12,7 @@ const getJson = async (url, options = {}) => {
 
 export const getStatus = () => getJson("/api/status");
 
+// De server verwacht een JSON-body met state "on" of "off".
 export const setLed = (state) =>
   getJson("/api/led", {
     method: "POST",
