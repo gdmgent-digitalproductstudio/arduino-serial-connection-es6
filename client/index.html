@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Arduino Serial Connection demo">
+    <title>Arduino Serial Connection</title>
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <main class="dashboard">
+      <header class="hero">
+        <p class="eyebrow">Digital Product Studio</p>
+        <h1>Arduino Serial Connection</h1>
+        <p>Lees een analoge sensor en stuur de ingebouwde led aan via een Express API.</p>
+      </header>
+
+      <section class="sensor-card" aria-labelledby="sensor-heading">
+        <p class="label" id="sensor-heading">Analoge sensor A0</p>
+        <p class="sensor-value"><span id="sensor-value">—</span><small>/ 1023</small></p>
+        <meter id="sensor-meter" min="0" max="1023" value="0">0</meter>
+        <p class="timestamp" id="sensor-timestamp">Nog geen meting ontvangen</p>
+      </section>
+
+      <section class="control-card" aria-labelledby="control-heading">
+        <div>
+          <p class="label" id="control-heading">Ingebouwde led</p>
+          <h2>Stuur een commando naar Arduino</h2>
+        </div>
+        <div class="button-group">
+          <button type="button" data-led-state="on">Led aan</button>
+          <button type="button" class="secondary" data-led-state="off">Led uit</button>
+        </div>
+        <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>
