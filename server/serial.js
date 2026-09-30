@@ -1,58 +1,65 @@
 import { ReadlineParser } from "@serialport/parser-readline";
 import { SerialPort } from "serialport";
 
-let port = null;
-const status = {
-  connected: false,
-  mode: "serial",
-  path: null,
-  sensor: null,
-  led: "off",
-  updatedAt: null
-};
+export class SerialDevice {
+  constructor({ path, baudRate }) {
+    this.path = path;
+    this.baudRate = baudRate;
+    this.port = null;
+    this.status = {
+      connected: false,
+      mode: "serial",
+      path,
+      sensor: null,
+      led: "off",
+      updatedAt: null
+    };
+  }
 
-const updateSensor = (value) => {
-  status.sensor = value;
-  status.updatedAt = new Date().toISOString();
-};
+  start() {
+    this.port = new SerialPort({ path: this.path, baudRate: this.baudRate });
+    const parser = this.port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
-export const startSerial = ({ path, baudRate }) => {
-  status.path = path;
-  port = new SerialPort({ path, baudRate });
-  const parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+    parser.on("data", (line) => {
+      const cleanLine = line.trim();
+      if (!cleanLine.startsWith("sensor:")) return;
 
-  parser.on("data", (line) => {
-    const cleanLine = line.trim();
-    if (!cleanLine.startsWith("sensor:")) return;
+      const value = Number.parseInt(cleanLine.slice("sensor:".length), 10);
+      if (Number.isFinite(value)) this.updateSensor(value);
+    });
 
-    const value = Number.parseInt(cleanLine.slice("sensor:".length), 10);
-    if (Number.isFinite(value)) updateSensor(value);
-  });
+    this.port.on("open", () => {
+      this.status.connected = true;
+      console.log(`Arduino verbonden via ${this.path}`);
+    });
 
-  port.on("open", () => {
-    status.connected = true;
-    console.log(`Arduino verbonden via ${path}`);
-  });
+    this.port.on("close", () => {
+      this.status.connected = false;
+    });
 
-  port.on("close", () => {
-    status.connected = false;
-  });
+    this.port.on("error", (error) => {
+      this.status.connected = false;
+      console.error(`Seriële fout: ${error.message}`);
+    });
+  }
 
-  port.on("error", (error) => {
-    status.connected = false;
-    console.error(`Seriële fout: ${error.message}`);
-  });
-};
+  updateSensor(value) {
+    this.status.sensor = value;
+    this.status.updatedAt = new Date().toISOString();
+  }
 
-export const getSerialStatus = () => ({ ...status });
+  getStatus() {
+    return { ...this.status };
+  }
 
-export const setSerialLed = (state) => {
-  if (!port?.isOpen) throw new Error("Arduino is niet verbonden.");
+  setLed(state) {
+    if (!this.port?.isOpen) throw new Error("Arduino is niet verbonden.");
 
-  port.write(state === "on" ? "led_on\n" : "led_off\n");
-  status.led = state;
-};
+    this.port.write(state === "on" ? "led_on\n" : "led_off\n");
+    this.status.led = state;
+  }
 
-export const stopSerial = () => {
-  if (port?.isOpen) port.close();
-};
+  stop() {
+    if (this.port?.isOpen) this.port.close();
+  }
+}

@@ -1,13 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
-import { getMockStatus, setMockLed, startMock, stopMock } from "./mock.js";
-import {
-  getSerialStatus,
-  setSerialLed,
-  startSerial,
-  stopSerial
-} from "./serial.js";
+import { MockDevice } from "./mock.js";
+import { SerialDevice } from "./serial.js";
 
 const app = express();
 const httpPort = Number(process.env.PORT ?? 3000);
@@ -18,24 +13,21 @@ const serialPath = process.env.SERIAL_PATH ?? pathArgument ?? "COM3";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const clientDirectory = path.resolve(currentDirectory, "../client");
 
-if (mock) {
-  startMock();
-} else {
-  startSerial({ path: serialPath, baudRate });
-}
+const device = mock
+  ? new MockDevice()
+  : new SerialDevice({ path: serialPath, baudRate });
 
-const getStatus = () => (mock ? getMockStatus() : getSerialStatus());
-const setLed = (state) => (mock ? setMockLed(state) : setSerialLed(state));
+device.start();
 
 app.use(express.json());
 app.use(express.static(clientDirectory));
 
 app.get("/api/status", (_request, response) => {
-  response.json(getStatus());
+  response.json(device.getStatus());
 });
 
 app.get("/api/sensor", (_request, response) => {
-  const { sensor, updatedAt } = getStatus();
+  const { sensor, updatedAt } = device.getStatus();
   response.json({ sensor, updatedAt });
 });
 
@@ -50,7 +42,7 @@ app.post("/api/led", (request, response) => {
   }
 
   try {
-    setLed(state);
+    device.setLed(state);
     return response.json({ status: "ok", led: state });
   } catch (error) {
     return response.status(503).json({
@@ -66,8 +58,7 @@ const server = app.listen(httpPort, () => {
 });
 
 const shutdown = () => {
-  if (mock) stopMock();
-  else stopSerial();
+  device.stop();
   server.close(() => process.exit(0));
 };
 
