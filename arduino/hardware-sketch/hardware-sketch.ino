@@ -1,5 +1,5 @@
 // Serieel protocol: sensor:<waarde> van Arduino naar Node en led_on/off terug.
-const byte LED_PIN = LED_BUILTIN;
+const byte LED_PIN = 0;
 const byte SENSOR_PIN = A0;
 const unsigned long SENSOR_INTERVAL = 500;
 

@@ -4,10 +4,10 @@
   "description": "Studentgerichte voorbeeldstack voor Arduino, Serial, Express en een ES6-frontend.",
   "type": "module",
   "scripts": {
-    "dev": "node --watch server/app.js",
-    "start": "node server/app.js",
-    "ports": "node server/list-ports.js",
-    "mock": "node server/app.js --mock"
+    "dev": "node --watch src/rapp.js",
+    "start": "node src/app.js",
+    "ports": "node src/list-ports.js",
+    "mock": "node src/app.js --mock"
   },
   "engines": {
     "node": ">=20"

@@ -12,7 +12,7 @@ const mock = process.argv.includes("--mock") || process.env.SERIAL_MOCK === "tru
 const pathArgument = process.argv.slice(2).find((argument) => !argument.startsWith("--"));
 const serialPath = process.env.SERIAL_PATH ?? pathArgument ?? "COM3";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
-const clientDirectory = path.resolve(currentDirectory, "../client");
+const clientDirectory = path.resolve(currentDirectory, "../../client");
 
 // Beide device-implementaties bieden hetzelfde start/getStatus/setLed/stop-contract.
 const device = mock
