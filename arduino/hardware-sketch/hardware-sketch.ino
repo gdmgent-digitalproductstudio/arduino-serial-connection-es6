@@ -1,12 +1,12 @@
 // Serieel protocol: sensor:<waarde> van Arduino naar Node en led_on/off terug.
-const byte LED_PIN = 0;
+const byte LED_PIN = 2;
 const byte SENSOR_PIN = A0;
 const unsigned long SENSOR_INTERVAL = 500;
 
 unsigned long previousSensorRead = 0;
 
 void setup() {
-  // Start met de ingebouwde LED uit en stem de baudrate af op de Node-server.
+  // Start met de externe LED op pin 2 uit en stem de baudrate af op Node.
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   Serial.begin(9600);
@@ -25,7 +25,7 @@ void loop() {
   }
 
   if (Serial.available() > 0) {
-    // Lees één volledig commando per regel en wijzig alleen de ingebouwde LED.
+    // Lees één volledig commando per regel en wijzig alleen de LED op pin 2.
     String command = Serial.readStringUntil('\n');
     command.trim();
 

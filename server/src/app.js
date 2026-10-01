@@ -1,6 +1,10 @@
+// dependencies
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+import "dotenv/config";
+
+// local libraries
 import { MockDevice } from "./mock.js";
 import { SerialDevice } from "./serial.js";
 
