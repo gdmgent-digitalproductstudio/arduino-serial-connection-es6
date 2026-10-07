@@ -28,12 +28,14 @@ export class SerialDevice {
       if (!cleanLine.startsWith("sensor:")) return;
 
       const value = Number.parseInt(cleanLine.slice("sensor:".length), 10);
-      if (Number.isFinite(value)) this.updateSensor(value);
+      if (Number.isFinite(value)) {
+        this.status.connected = true;
+        this.updateSensor(value);
+      }
     });
 
     this.port.on("open", () => {
-      this.status.connected = true;
-      console.log(`Arduino verbonden via ${this.path}`);
+      console.log(`Seriële poort geopend via ${this.path}; wachten op Arduino...`);
     });
 
     this.port.on("close", () => {
@@ -58,7 +60,7 @@ export class SerialDevice {
   }
 
   setLed(state) {
-    if (!this.port?.isOpen) throw new Error("Arduino is niet verbonden.");
+    if (!this.status.connected) throw new Error("Arduino is nog niet klaar.");
 
     // Dit protocol wordt ook door hardware-sketch.ino verwerkt.
     this.port.write(state === "on" ? "led_on\n" : "led_off\n");

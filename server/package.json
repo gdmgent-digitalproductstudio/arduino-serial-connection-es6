@@ -7,6 +7,7 @@
     "dev": "node --watch src/rapp.js",
     "start": "node src/app.js",
     "arduino": "node src/arduino.js",
+    "arduino-simple": "node src/arduino-simple.js",
     "ports": "node src/list-ports.js",
     "mock": "node src/app.js --mock"
   },
